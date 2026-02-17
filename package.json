@@ -1,0 +1,23 @@
+{
+  "name": "cartgrafias-imposibles",
+  "version": "1.0.0",
+  "description": "Scripting and viewer testing tools for 3d suminagashi experiment",
+  "type": "module",
+  "scripts": {
+    "serve": "serve .",
+    "extrude": "node proximityExtrude.js"
+  },
+  "author": "Rafael Becerra",
+  "license": "MIT",
+  "dependencies": {
+    "@gltf-transform/core": "^4.3.0",
+    "@gltf-transform/extensions": "^4.3.0",
+    "@gltf-transform/functions": "^4.3.0",
+    "three": "^0.182.0",
+    "three-stdlib": "^2.36.1",
+    "tweakpane": "^4.0.5"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

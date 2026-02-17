@@ -1,0 +1,30 @@
+carto 13  const TOP_CURVE = 212;
+const BOTTOM_CURVE = 142;
+
+const TOP_CURVE_2 = 72;
+const BOTTOM_CURVE_2 = 140;
+
+carto 5 => primera montaña 416 top 210 bottom
+           segunda montaña 209 003
+
+
+carto 7 ->  350 -> 242
+            241 -> 122
+
+            98 -> 002
+
+carto 2 449 -> 301
+        297 -> 151
+        146 -> 1
+
+
+carto 8 415 -> 370
+        369 -> 324
+        322 -> 278
+
+        277 -> 186
+        185 -> 140
+
+        139 -> 94
+        93 -> 48
+        47 -> 2

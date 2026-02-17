@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Contour Terrain Viewer</title>
+<title>Cartografías Imposibles</title>
 <style>
   body { margin: 0; overflow: hidden; background: #111; }
 </style>
@@ -22,6 +22,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "/node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+import { RGBELoader } from "/node_modules/three/examples/jsm/loaders/RGBELoader.js";
+import { PMREMGenerator } from "/node_modules/three/src/extras/PMREMGenerator.js";
 import { Pane } from "tweakpane";
 
 const scene = new THREE.Scene();
@@ -44,52 +46,146 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 
+// ENVIRONMENT MAPS
+const pmrem = new PMREMGenerator(renderer);
+pmrem.compileEquirectangularShader();
+
+const rgbeLoader = new RGBELoader();
+
+let currentEnvMap = null;
+
+function loadEnvironment(path) {
+  rgbeLoader.load(path, (hdr) => {
+
+    const envMap = pmrem.fromEquirectangular(hdr).texture;
+
+    scene.environment = envMap;   // lighting & reflections
+    scene.background = envMap;    // visible sky (optional)
+    scene.backgroundBlurriness = params.bgBlur;
+    scene.backgroundIntensity = 1;
+
+    if (currentEnvMap) currentEnvMap.dispose();
+    currentEnvMap = envMap;
+    light.intensity = 0;
+    ambient.light = 0;
+    hdr.dispose();
+  });
+}
+
 document.body.appendChild(renderer.domElement);
 
 // CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
+// auto rotate
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.6;
+
+controls.addEventListener("start", () => {
+  controls.autoRotate = false;
+});
+
+controls.addEventListener("end", () => {
+  if (params.autoRotate) controls.autoRotate = true;
+});
+
 // LIGHTS
-const light = new THREE.DirectionalLight(0xffffff, 2);
+const light = new THREE.DirectionalLight(0xffffff, 0);
 light.position.set(50, 100, 50);
 scene.add(light);
 
-const ambient = new THREE.AmbientLight(0xffffff, 1.52);
+const ambient = new THREE.AmbientLight(0xffffff, 0);
 scene.add(ambient);
 
-// MODEL
-let model;
+let currentModel = null;
+let loading = false;
 
 const loader = new GLTFLoader();
-loader.load("./cart7.glb", (gltf) => {
 
-  model = gltf.scene;
-  scene.add(model);
+function loadModel(name) {
+  if (loading) return;
+  loading = true;
 
-  // compute bounding box
-  const box = new THREE.Box3().setFromObject(model);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
+  loader.load(`./glb/${name}.glb`, (gltf) => {
 
-  // center the model
-  model.position.sub(center);
+    // remove & dispose previous model
+    if (currentModel) {
+      scene.remove(currentModel);
+      disposeModel(currentModel);
+      currentModel = null;
+    }
 
-  // compute ideal camera distance
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const fov = camera.fov * (Math.PI / 180);
-  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+    const model = gltf.scene;
+    currentModel = model;
+    scene.add(model);
 
-  cameraZ *= 1.4; // padding factor
+    // center model
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
 
-  camera.position.set(0, cameraZ * 0.6, cameraZ);
-  camera.lookAt(0, 0, 0);
+    model.position.sub(center);
 
-  // update OrbitControls
-  controls.target.set(0, 0, 0);
-  controls.maxDistance = cameraZ * 10;
-  controls.update();
-});
+    // ensure env reflections update
+    model.traverse((o) => {
+      if (o.isMesh && o.material) {
+        o.material.envMapIntensity = 1.0;
+        o.material.needsUpdate = true;
+      }
+    });
+
+    // camera framing
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+    cameraZ *= 1.4;
+
+    camera.position.set(0, cameraZ * 0.6, cameraZ);
+    camera.lookAt(0, 0, 0);
+
+    controls.target.set(0, 0, 0);
+    controls.maxDistance = cameraZ * 10;
+    controls.update();
+
+    loading = false;
+
+  }, undefined, (err) => {
+    console.error(err);
+    loading = false;
+  });
+}
+
+
+function disposeModel(object) {
+  object.traverse((child) => {
+    if (!child.isMesh) return;
+
+    // dispose geometry
+    child.geometry.dispose();
+
+    // dispose material(s)
+    const materials = Array.isArray(child.material)
+      ? child.material
+      : [child.material];
+
+    materials.forEach(mat => {
+      // dispose textures inside material
+      for (const key in mat) {
+        const value = mat[key];
+        if (value && value.isTexture) {
+          value.dispose();
+        }
+      }
+      mat.dispose();
+    });
+  });
+}
+
+
+loadModel("cart2");
+loadEnvironment("./env/park.hdr")
 
 // TWEAKPANE
 const params = {
@@ -97,13 +193,30 @@ const params = {
   ambient: 1.52,
   exposure: 1,
   roughness: 1,
-  metalness: 0,
-  wireframe: false,
-  flatShading: false
+  environment: "none",
+  bgBlur: 0.15,
+  autoRotate: true,
+  rotateSpeed: 0.6
 };
 
 const pane = new Pane();
 pane.title = "Scene Controls";
+
+pane.addBlade({
+  view: "list",
+  label: "model",
+  options: [
+    { text: "El valle de las tres cumbres", value: "cart2" },
+    { text: "Picos refractados del delirio", value: "cart5" },
+    { text: "Mesetas de hielo fracturado", value: "cart7" },
+    { text: "Fragmentos de un relieve desprendido", value: "cart8" },
+    { text: "El río que arde entre dos cráteres", value: "cart13" }
+  ],
+  value: "cart2"
+}).on("change", e => {
+  loadModel(e.value);
+});
+
 
 pane.addBinding(params, "lightIntensity", { min:0, max:5 }).on("change", e => {
   light.intensity = e.value;
@@ -126,32 +239,66 @@ pane.addBinding(params, "roughness", { min:0, max:1 }).on("change", e => {
   });
 });
 
-pane.addBinding(params, "metalness", { min:0, max:1 }).on("change", e => {
-  if (!model) return;
-  model.traverse(o=>{
-    if(o.isMesh && o.material.metalness !== undefined){
-      o.material.metalness = e.value;
-    }
-  });
+pane.addBinding(params, "environment", {
+  options: {
+    Snow: "snow",
+    Lenong: "lenong",
+    Green: "green",
+    Park: "park",
+    Sahara: "sahara",
+    Stars: "stars",
+    None: "none"
+  }
+}).on("change", e => {
+
+  if (e.value === "snow") {
+    loadEnvironment("./env/snow.hdr");
+  }
+
+  if (e.value === "lenong") {
+    loadEnvironment("./env/lenong.hdr");
+  }
+
+  if(e.value === "green") {
+    loadEnvironment("./env/green.hdr");
+  }
+
+  if(e.value === "park") {
+    loadEnvironment("./env/park.hdr");
+  }
+
+  if(e.value === "sahara") {
+    loadEnvironment("./env/sahara.hdr");
+  }
+
+  if(e.value === "stars") {
+    loadEnvironment("./env/stars.hdr");
+  }
+
+  if (e.value === "none") {
+    scene.environment = null;
+    scene.background = new THREE.Color(0x111111);
+    light.intensity = params.lightIntensity;
+    ambient.intensity = params.ambient;
+  }
+
 });
 
-pane.addBinding(params, "wireframe").on("change", e => {
-  if (!model) return;
-  model.traverse(o=>{
-    if(o.isMesh){
-      o.material.wireframe = e.value;
-    }
-  });
+pane.addBinding(params, "bgBlur", { min: 0, max: 1, step: 0.01 })
+.on("change", e => {
+  scene.backgroundBlurriness = e.value;
 });
 
-pane.addBinding(params, "flatShading").on("change", e => {
-  if (!model) return;
-  model.traverse(o=>{
-    if(o.isMesh){
-      o.material.flatShading = e.value;
-      o.material.needsUpdate = true;
-    }
-  });
+pane.addBinding(params, "autoRotate").on("change", e => {
+  controls.autoRotate = e.value;
+});
+
+pane.addBinding(params, "rotateSpeed", {
+  min: 0,
+  max: 5,
+  step: 0.1
+}).on("change", e => {
+  controls.autoRotateSpeed = e.value;
 });
 
 // LOOP

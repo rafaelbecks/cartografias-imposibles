@@ -7,15 +7,14 @@ from mathutils import Vector
 # -------- SETTINGS --------
 
 MODE = "terrain"
-PROFILE = "dune"  # "mountain" | "volcano" | "dune"
 
-MAX_HEIGHT = 0.04
+MAX_HEIGHT = 0.055
 COMPENSATE_CENTER = True
 
 # use index range instead of selection
 USE_RANGE = True
-TOP_CURVE = 416
-BOTTOM_CURVE = 210
+TOP_CURVE = 47
+BOTTOM_CURVE = 2
 
 # --------------------------
 
@@ -26,12 +25,7 @@ def get_curve_index(name):
 
 
 def height_profile(t):
-    if PROFILE == "mountain":
-        return MAX_HEIGHT * (1 - pow(t, 1.7))
-    if PROFILE == "volcano":
-        return MAX_HEIGHT * (1 - pow(t, 10))
-    if PROFILE == "dune":
-        return MAX_HEIGHT * math.cos(t * math.pi / 1.5)
+    return MAX_HEIGHT * math.cos(t * math.pi / 1.5)
 
 # -------- GET CURVES --------
 
