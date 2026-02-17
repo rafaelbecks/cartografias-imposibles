@@ -5,9 +5,7 @@ import math
 from mathutils import Vector
 
 # -------- SETTINGS --------
-
-MODE = "terrain"
-
+#
 MAX_HEIGHT = 0.055
 COMPENSATE_CENTER = True
 
