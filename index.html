@@ -11,7 +11,10 @@
 <title>Cartografías Imposibles</title>
 <style>
   body { margin: 0; overflow: hidden; background: #111; }
-  
+
+  canvas {
+    display: block;
+  }
   /* Mobile Tweakpane styles */
   @media (max-width: 768px) {
     .tp-dfwv {
@@ -69,6 +72,7 @@ renderer.physicallyCorrectLights = true;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
+renderer.setPixelRatio(window.devicePixelRatio);
 
 // ENVIRONMENT MAPS
 const pmrem = new THREE.PMREMGenerator(renderer);
