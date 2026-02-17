@@ -185,7 +185,7 @@ function disposeModel(object) {
 
 
 loadModel("cart2");
-loadEnvironment("./env/park.hdr")
+loadEnvironment("./env/lenong.hdr")
 
 // TWEAKPANE
 const params = {
@@ -194,7 +194,7 @@ const params = {
   exposure: 1,
   roughness: 1,
   environment: "none",
-  bgBlur: 0.15,
+  bgBlur: 0,
   autoRotate: true,
   rotateSpeed: 0.6
 };
@@ -241,6 +241,10 @@ pane.addBinding(params, "roughness", { min:0, max:1 }).on("change", e => {
 
 pane.addBinding(params, "environment", {
   options: {
+    Belfast: 'belfast',
+    Firesky: 'firesky',
+    Mpumalanga: 'mpumalanga',
+    Orchard: 'orchard',
     Snow: "snow",
     Lenong: "lenong",
     Green: "green",
@@ -251,29 +255,7 @@ pane.addBinding(params, "environment", {
   }
 }).on("change", e => {
 
-  if (e.value === "snow") {
-    loadEnvironment("./env/snow.hdr");
-  }
-
-  if (e.value === "lenong") {
-    loadEnvironment("./env/lenong.hdr");
-  }
-
-  if(e.value === "green") {
-    loadEnvironment("./env/green.hdr");
-  }
-
-  if(e.value === "park") {
-    loadEnvironment("./env/park.hdr");
-  }
-
-  if(e.value === "sahara") {
-    loadEnvironment("./env/sahara.hdr");
-  }
-
-  if(e.value === "stars") {
-    loadEnvironment("./env/stars.hdr");
-  }
+  loadEnvironment(`./env/${e.value}.hdr`);
 
   if (e.value === "none") {
     scene.environment = null;
