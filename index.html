@@ -2,9 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#111111" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
 <title>Cartografías Imposibles</title>
 <style>
   body { margin: 0; overflow: hidden; background: #111; }
+  
+  /* Mobile Tweakpane styles */
+  @media (max-width: 768px) {
+    .tp-dfwv {
+      position: fixed !important;
+      top: auto !important;
+      bottom: 0 !important;
+      right: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 12px 12px 0 0 !important;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.5) !important;
+    }
+    .tp-dfwv .tp-rotv {
+      width: 100% !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -199,8 +223,13 @@ const params = {
   rotateSpeed: 0.6
 };
 
-const pane = new Pane();
-pane.title = "Scene Controls";
+const pane = new Pane({ title: "Scene Controls" });
+
+// Collapse pane on mobile by default
+const isMobile = window.matchMedia("(max-width: 768px)").matches;
+if (isMobile) {
+  pane.expanded = false;
+}
 
 pane.addBlade({
   view: "list",
