@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Contour Terrain Viewer</title>
+<style>
+  body { margin: 0; overflow: hidden; background: #111; }
+</style>
+</head>
+<body>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/node_modules/three/build/three.module.js",
+    "tweakpane": "/node_modules/tweakpane/dist/tweakpane.min.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "/node_modules/three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "/node_modules/three/examples/jsm/loaders/GLTFLoader.js";
+import { Pane } from "tweakpane";
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+// CAMERA
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth/window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(0, 240, 120);
+
+// RENDERER
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.physicallyCorrectLights = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+document.body.appendChild(renderer.domElement);
+
+// CONTROLS
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// LIGHTS
+const light = new THREE.DirectionalLight(0xffffff, 2);
+light.position.set(50, 100, 50);
+scene.add(light);
+
+const ambient = new THREE.AmbientLight(0xffffff, 1.52);
+scene.add(ambient);
+
+// MODEL
+let model;
+
+const loader = new GLTFLoader();
+loader.load("./cart7.glb", (gltf) => {
+
+  model = gltf.scene;
+  scene.add(model);
+
+  // compute bounding box
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+
+  // center the model
+  model.position.sub(center);
+
+  // compute ideal camera distance
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = camera.fov * (Math.PI / 180);
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+  cameraZ *= 1.4; // padding factor
+
+  camera.position.set(0, cameraZ * 0.6, cameraZ);
+  camera.lookAt(0, 0, 0);
+
+  // update OrbitControls
+  controls.target.set(0, 0, 0);
+  controls.maxDistance = cameraZ * 10;
+  controls.update();
+});
+
+// TWEAKPANE
+const params = {
+  lightIntensity: 2.8,
+  ambient: 1.52,
+  exposure: 1,
+  roughness: 1,
+  metalness: 0,
+  wireframe: false,
+  flatShading: false
+};
+
+const pane = new Pane();
+pane.title = "Scene Controls";
+
+pane.addBinding(params, "lightIntensity", { min:0, max:5 }).on("change", e => {
+  light.intensity = e.value;
+});
+
+pane.addBinding(params, "ambient", { min:0, max:2 }).on("change", e => {
+  ambient.intensity = e.value;
+});
+
+pane.addBinding(params, "exposure", { min:0.1, max:3 }).on("change", e => {
+  renderer.toneMappingExposure = e.value;
+});
+
+pane.addBinding(params, "roughness", { min:0, max:1 }).on("change", e => {
+  if (!model) return;
+  model.traverse(o=>{
+    if(o.isMesh && o.material.roughness !== undefined){
+      o.material.roughness = e.value;
+    }
+  });
+});
+
+pane.addBinding(params, "metalness", { min:0, max:1 }).on("change", e => {
+  if (!model) return;
+  model.traverse(o=>{
+    if(o.isMesh && o.material.metalness !== undefined){
+      o.material.metalness = e.value;
+    }
+  });
+});
+
+pane.addBinding(params, "wireframe").on("change", e => {
+  if (!model) return;
+  model.traverse(o=>{
+    if(o.isMesh){
+      o.material.wireframe = e.value;
+    }
+  });
+});
+
+pane.addBinding(params, "flatShading").on("change", e => {
+  if (!model) return;
+  model.traverse(o=>{
+    if(o.isMesh){
+      o.material.flatShading = e.value;
+      o.material.needsUpdate = true;
+    }
+  });
+});
+
+// LOOP
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// RESIZE
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
