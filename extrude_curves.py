@@ -6,13 +6,13 @@ from mathutils import Vector
 
 # -------- SETTINGS --------
 #
-MAX_HEIGHT = 0.055
+MAX_HEIGHT = 0.05
 COMPENSATE_CENTER = True
 
 # use index range instead of selection
 USE_RANGE = True
-TOP_CURVE = 329
-BOTTOM_CURVE = 166
+TOP_CURVE = 277
+BOTTOM_CURVE = 2
 
 # --------------------------
 
