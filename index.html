@@ -15,6 +15,21 @@
   canvas {
     display: block;
   }
+
+  #position {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    font-family: monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    background: rgba(0,0,0,0.45);
+    padding: 8px 12px;
+    border-radius: 6px;
+    pointer-events: none;
+    line-height: 1.6;
+    z-index: 999;
+  }
   /* Mobile Tweakpane styles */
   @media (max-width: 768px) {
     .tp-dfwv {
@@ -88,7 +103,8 @@ const params = {
   moveSpeed: 5,
   fpMove: true,
   autoRotate: false,
-  rotateSpeed: 0.6
+  rotateSpeed: 0.6,
+  debug: false
 };
 
 // ENVIRONMENT MAPS
@@ -234,7 +250,7 @@ function loadModel(name) {
 
     cameraZ *= 1.4;
 
-    camera.position.set(0, cameraZ * 0.6, cameraZ);
+    camera.position.set(0, cameraZ, 0);
     camera.lookAt(0, 0, 0);
 
     controls.target.set(0, 0, 0);
@@ -386,12 +402,26 @@ pane.addBinding(params, "rotateSpeed", {
   controls.autoRotateSpeed = e.value;
 });
 
+pane.addBinding(params, "debug", { label: "Show position" }).on("change", e => {
+  document.getElementById("position").style.display = e.value ? "block" : "none";
+});
+
+// DEBUG OVERLAY
+const posEl = document.getElementById("position");
+posEl.style.display = "none";
+
 // LOOP
 function animate() {
   requestAnimationFrame(animate);
   applyWalkMovement(clock.getDelta());
   controls.update();
   renderer.render(scene, camera);
+
+  const p = camera.position;
+  const t = controls.target;
+  posEl.innerHTML =
+    `cam &nbsp; x: ${p.x.toFixed(2)} &nbsp; y: ${p.y.toFixed(2)} &nbsp; z: ${p.z.toFixed(2)}<br>` +
+    `target x: ${t.x.toFixed(2)} &nbsp; y: ${t.y.toFixed(2)} &nbsp; z: ${t.z.toFixed(2)}`;
 }
 animate();
 
@@ -402,5 +432,7 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 </script>
+
+<section id="position"></section>
 </body>
 </html>
