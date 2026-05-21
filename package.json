@@ -4,7 +4,9 @@
   "description": "Scripting and viewer testing tools for 3d suminagashi experiment",
   "type": "module",
   "scripts": {
-    "start": "serve . -p 9989"
+    "start": "serve . -p 9989",
+    "convert:env": "bash scripts/convert-env-jpg.sh",
+    "generate:exr": "node scripts/generate-exr-config.mjs"
   },
   "author": "Rafael Becerra",
   "license": "MIT",

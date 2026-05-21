@@ -1,7 +1,9 @@
-/** Change this to switch the environment loaded on startup. */
+/** Change these to switch the environment loaded on startup. */
+export const DEFAULT_ENV_FORMAT = "hdr";
 export const DEFAULT_ENV = "industrial_sunset";
+export const DEFAULT_EXR_ENV = "img_8577";
 
-export const ENVIRONMENTS = {
+export const HDR_ENVIRONMENTS = {
   industrial_sunset: {
     label: "Industrial Sunset",
     file: "industrial_sunset_02_puresky_1k.hdr",
@@ -24,13 +26,30 @@ export const ENVIRONMENTS = {
   },
 };
 
-export const ENV_OPTIONS = Object.fromEntries(
-  Object.entries(ENVIRONMENTS).map(([id, { label }]) => [label, id])
-);
+import { EXR_ENVIRONMENTS } from "./exrEnvironments.generated.js";
+export { EXR_ENVIRONMENTS };
 
-export function getEnvPath(envId) {
-  const env = ENVIRONMENTS[envId];
-  return env?.file ? `./env/${env.file}` : null;
+export const ENV_FORMAT_OPTIONS = { HDR: "hdr", EXR: "exr" };
+
+export function getEnvironments(format) {
+  return format === "exr" ? EXR_ENVIRONMENTS : HDR_ENVIRONMENTS;
+}
+
+export function getEnvOptions(format) {
+  return Object.fromEntries(
+    Object.entries(getEnvironments(format)).map(([id, { label }]) => [label, id])
+  );
+}
+
+export function getDefaultEnvId(format) {
+  return format === "exr" ? DEFAULT_EXR_ENV : DEFAULT_ENV;
+}
+
+export function getEnvPath(envId, format = DEFAULT_ENV_FORMAT) {
+  const env = getEnvironments(format)[envId];
+  if (!env?.file) return null;
+  const subdir = format === "exr" ? "exr/" : "";
+  return `./env/${subdir}${env.file}`;
 }
 
 export const params = {
@@ -38,6 +57,7 @@ export const params = {
   ambient: 1.52,
   exposure: 1,
   roughness: 0.5,
+  envFormat: DEFAULT_ENV_FORMAT,
   environment: DEFAULT_ENV,
   bgBlur: 0,
   moveSpeed: 5,
@@ -46,6 +66,7 @@ export const params = {
   rotateSpeed: 0.6,
   debug: false,
   wireframe: false,
+  model: "cart2",
 };
 
 /** Camera intro when a model loads. startY uses auto-framed height unless set. */

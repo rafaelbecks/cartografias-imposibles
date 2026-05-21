@@ -36,7 +36,7 @@ function applyWireframe(model, enabled) {
   });
 }
 
-export function createModelLoader({ scene, camera, controls }) {
+export function createModelLoader({ scene, camera, controls, onModelLoaded }) {
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath(
     "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
@@ -108,6 +108,7 @@ export function createModelLoader({ scene, camera, controls }) {
         });
 
         applyWireframe(model, params.wireframe);
+        onModelLoaded?.(model);
         const framedY = frameCamera(size);
         startIntroAnimation(framedY);
         loading = false;

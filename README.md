@@ -27,6 +27,40 @@ npm install
 npm run start
 ```
 
+#### Environment maps (EXR)
+
+Experimental deformed environments are built from photos in `env/exr/jpg/` (`.jpg`, `.jpeg`, `.heic`). Conversion uses [OpenImageIO](https://openimageio.readthedocs.io/) (`oiiotool`).
+
+**Install OpenImageIO (macOS):**
+
+```bash path=null start=null
+brew install openimageio
+```
+
+**Convert sources to EXR** (writes `env/exr/<name>_env.exr` and regenerates the env list in `src/exrEnvironments.generated.js`):
+
+```bash path=null start=null
+npm run convert:env
+```
+
+Each image is processed with:
+
+```bash path=null start=null
+oiiotool <source> \
+  --tocolorspace linear \
+  --mulc 6,6,6 \
+  --resize 4096x2048 \
+  -o env/exr/<name>_env.exr
+```
+
+After conversion, restart the viewer and pick **env type → EXR** in Tweakpane to use the new maps.
+
+#### Scene state
+
+In the viewer, use **State → Export JSON** / **Load JSON** (above the Scene/Animation tabs) to save and restore scene settings (model, lighting, environment, camera, terrain animation, grain overlay, etc.).
+
+**Grain overlay** uses [grained.js](https://github.com/sarathsaleem/grained) (MIT) — enable it in the **Grain overlay** folder at the bottom of the controls panel.
+
 ## Author
 
 Rafael Becerra

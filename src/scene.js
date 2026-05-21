@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { EXRLoader } from "three/addons/loaders/EXRLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { params } from "./config.js";
 
@@ -48,23 +49,27 @@ export function createSceneSystem() {
   pmrem.compileEquirectangularShader();
 
   const rgbeLoader = new RGBELoader();
+  const exrLoader = new EXRLoader();
   let currentEnvMap = null;
 
-  function loadEnvironment(path) {
-    rgbeLoader.load(path, (hdr) => {
-      const envMap = pmrem.fromEquirectangular(hdr).texture;
+  function applyEnvironmentTexture(texture) {
+    const envMap = pmrem.fromEquirectangular(texture).texture;
 
-      scene.environment = envMap;
-      scene.background = envMap;
-      scene.backgroundBlurriness = params.bgBlur;
-      scene.backgroundIntensity = 1;
+    scene.environment = envMap;
+    scene.background = envMap;
+    scene.backgroundBlurriness = params.bgBlur;
+    scene.backgroundIntensity = 1;
 
-      if (currentEnvMap) currentEnvMap.dispose();
-      currentEnvMap = envMap;
-      light.intensity = 0;
-      ambient.intensity = 0;
-      hdr.dispose();
-    });
+    if (currentEnvMap) currentEnvMap.dispose();
+    currentEnvMap = envMap;
+    light.intensity = 0;
+    ambient.intensity = 0;
+    texture.dispose();
+  }
+
+  function loadEnvironment(path, format = "hdr") {
+    const loader = format === "exr" ? exrLoader : rgbeLoader;
+    loader.load(path, applyEnvironmentTexture);
   }
 
   function clearEnvironment() {

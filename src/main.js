@@ -4,25 +4,38 @@ import { createSceneSystem } from "./scene.js";
 import { createModelLoader } from "./modelLoader.js";
 import { createInputSystem } from "./input.js";
 import { createUI } from "./ui.js";
+import { createTerrainAnimation } from "./terrain/terrainAnimation.js";
+import { createGrainOverlay } from "./grain/grainOverlay.js";
 
 const sceneSystem = createSceneSystem();
 const { scene, camera, renderer, controls, light, ambient, loadEnvironment, clearEnvironment } =
   sceneSystem;
 
-const modelLoader = createModelLoader({ scene, camera, controls });
+const terrainAnimation = createTerrainAnimation();
+const grainOverlay = createGrainOverlay();
+
+const modelLoader = createModelLoader({
+  scene,
+  camera,
+  controls,
+  onModelLoaded: (model) => terrainAnimation.bindModel(model),
+});
 const input = createInputSystem(camera, controls);
 
-createUI({
+const ui = createUI({
   loadModel: modelLoader.loadModel,
   loadEnvironment,
   clearEnvironment,
   scene,
+  camera,
   renderer,
   light,
   ambient,
   controls,
   modelLoader,
   input,
+  terrainAnimation,
+  grainOverlay,
 });
 
 const posEl = document.getElementById("position");
@@ -33,6 +46,7 @@ const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
   input.applyWalkMovement(clock.getDelta());
+  terrainAnimation.update(clock.getElapsedTime());
   modelLoader.updateIntro();
   controls.update();
   renderer.render(scene, camera);
@@ -44,6 +58,6 @@ function animate() {
     `target x: ${t.x.toFixed(2)} &nbsp; y: ${t.y.toFixed(2)} &nbsp; z: ${t.z.toFixed(2)}`;
 }
 
-modelLoader.loadModel("cart2");
-loadEnvironment(getEnvPath(params.environment));
+modelLoader.loadModel(params.model);
+ui.reloadEnvironment();
 animate();
