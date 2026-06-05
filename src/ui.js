@@ -5,6 +5,8 @@ import { setupAnimationUI } from "./terrain/animationUI.js";
 import { setupGrainUI } from "./grain/grainUI.js";
 import { setupSceneTabUI } from "./ui/sceneTabUI.js";
 import { setupPaneToggle } from "./ui/paneToggle.js";
+import { setupScenesUI } from "./ui/scenesUI.js";
+import { createSidePanel } from "./ui/sidePanel.js";
 import { setupSensorUI } from "./ui/sensorUI.js";
 import { setupTextUI } from "./text/textUI.js";
 
@@ -18,8 +20,9 @@ export function createUI(ctx) {
     return Promise.resolve();
   }
 
-  const pane = new Pane({ title: "Controls" });
-  setupPaneToggle(pane);
+  const { panel, scroll, toggleBtn } = createSidePanel();
+  const pane = new Pane({ title: "Controls", container: scroll });
+  const paneToggle = setupPaneToggle({ panel, toggleBtn });
 
   const isMobile = window.matchMedia("(max-width: 768px)").matches;
   if (isMobile) pane.expanded = false;
@@ -57,6 +60,13 @@ export function createUI(ctx) {
     fileInput.click();
   });
 
+  const scenesUI = setupScenesUI(stateFolder, {
+    ...ctx,
+    ui: { refresh: () => refresh() },
+    reloadEnvironment,
+    loadModel,
+  });
+
   const tab = pane.addTab({
     pages: [{ title: "Scene" }, { title: "Animation" }, { title: "Text" }],
   });
@@ -91,5 +101,5 @@ export function createUI(ctx) {
     ctx.sensorClient.onStatus = sensorUI.onStatus;
   }
 
-  return { pane, refresh, reloadEnvironment, sensorUI };
+  return { pane, refresh, reloadEnvironment, sensorUI, paneToggle, scenesUI };
 }

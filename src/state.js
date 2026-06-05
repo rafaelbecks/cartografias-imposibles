@@ -198,6 +198,11 @@ export function downloadState(state) {
   URL.revokeObjectURL(url);
 }
 
+async function loadStatePayload(text, ctx) {
+  const state = JSON.parse(text);
+  await applyState(state, ctx, { silent: true });
+}
+
 export async function loadStateFromFile(file, ctx) {
   const loading = ctx.loading;
 
@@ -205,9 +210,21 @@ export async function loadStateFromFile(file, ctx) {
     setProgress(0.1);
     const text = await file.text();
     setProgress(0.45);
-    const state = JSON.parse(text);
-    setProgress(0.55);
-    await applyState(state, ctx, { silent: true });
+    await loadStatePayload(text, ctx);
+    setProgress(1);
+  });
+}
+
+export async function loadStateFromUrl(url, ctx) {
+  const loading = ctx.loading;
+
+  await loading?.run("memory", async ({ setProgress }) => {
+    setProgress(0.1);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch ${url} (${res.status})`);
+    const text = await res.text();
+    setProgress(0.45);
+    await loadStatePayload(text, ctx);
     setProgress(1);
   });
 }

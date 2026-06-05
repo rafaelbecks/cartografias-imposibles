@@ -90,21 +90,140 @@
     0% { transform: translateX(-120%); }
     100% { transform: translateX(320%); }
   }
+
+  #panel-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    mix-blend-mode: difference;
+    pointer-events: auto;
+  }
+
+  #panel-toggle[aria-expanded="true"] {
+    display: none;
+  }
+
+  #panel-toggle img {
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+
+  #side-panel {
+    --tp-base-background-color: hsla(230, 7%, 12%, 0.72);
+    --tp-base-shadow-color: hsla(0, 0%, 0%, 0.2);
+    --tp-button-background-color: hsla(230, 7%, 20%, 0.55);
+    --tp-button-background-color-active: hsla(230, 7%, 28%, 0.65);
+    --tp-button-background-color-focus: hsla(230, 7%, 24%, 0.6);
+    --tp-button-background-color-hover: hsla(230, 7%, 24%, 0.6);
+    --tp-button-foreground-color: hsla(0, 0%, 100%, 0.95);
+    --tp-container-foreground-color: hsla(0, 0%, 100%, 0.92);
+    --tp-input-background-color: hsla(230, 7%, 10%, 0.55);
+    --tp-input-background-color-active: hsla(230, 7%, 14%, 0.65);
+    --tp-input-background-color-focus: hsla(230, 7%, 12%, 0.6);
+    --tp-input-background-color-hover: hsla(230, 7%, 12%, 0.6);
+    --tp-input-foreground-color: hsla(0, 0%, 100%, 0.92);
+    --tp-label-foreground-color: hsla(0, 0%, 100%, 0.88);
+    --tp-monitor-background-color: hsla(230, 7%, 10%, 0.45);
+    --tp-monitor-foreground-color: hsla(0, 0%, 100%, 0.85);
+    --tp-groove-foreground-color: hsla(0, 0%, 100%, 0.18);
+
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    max-width: min(280px, 90vw);
+    height: 100vh;
+    z-index: 1001;
+    background: var(--tp-base-background-color);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: -4px 0 24px var(--tp-base-shadow-color);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    pointer-events: auto;
+  }
+
+  #side-panel.hidden {
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #side-panel-scroll {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+  }
+
+  #side-panel-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #side-panel-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #side-panel-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 4px;
+  }
+
+  #side-panel-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  #side-panel .tp-dfwv {
+    position: relative !important;
+    top: 0 !important;
+    right: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+  }
+
+  #side-panel .tp-dfwv .tp-rotv {
+    width: 100% !important;
+    background-color: transparent !important;
+  }
+
+  #side-panel .tp-dfwv .tp-rotv_b {
+    background-color: transparent !important;
+  }
+
   /* Mobile Tweakpane styles */
   @media (max-width: 768px) {
-    .tp-dfwv {
-      position: fixed !important;
-      top: auto !important;
-      bottom: 0 !important;
-      right: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      border-radius: 12px 12px 0 0 !important;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.5) !important;
+    #side-panel {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      max-height: 65vh;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
     }
-    .tp-dfwv .tp-rotv {
-      width: 100% !important;
+
+    #side-panel.hidden {
+      transform: translateY(100%);
+      opacity: 0;
     }
   }
 </style>
@@ -127,6 +246,14 @@
 </script>
 
 <script type="module" src="./src/main.js"></script>
+
+<button id="panel-toggle" type="button" aria-label="Open controls" aria-expanded="false" aria-controls="side-panel">
+  <img src="./icons/shapes-outline.svg" alt="" width="24" height="24" />
+</button>
+
+<aside id="side-panel">
+  <div id="side-panel-scroll"></div>
+</aside>
 
 <section id="position"></section>
 

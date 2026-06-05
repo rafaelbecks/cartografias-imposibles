@@ -1,11 +1,27 @@
-/** Toggle Tweakpane visibility with Ctrl+I (Cmd+I on macOS). */
-export function setupPaneToggle(pane) {
-  let visible = true;
+/** Open via top-right icon; close on outside click or Ctrl+I (Cmd+I on macOS). */
+export function setupPaneToggle({ panel, toggleBtn }) {
+  let visible = false;
 
   function setVisible(show) {
     visible = show;
-    pane.element.style.display = show ? "" : "none";
+    panel.classList.toggle("hidden", !show);
+    toggleBtn?.setAttribute("aria-expanded", String(show));
   }
+
+  function toggle() {
+    setVisible(!visible);
+  }
+
+  toggleBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!visible) setVisible(true);
+  });
+
+  panel.addEventListener("click", (e) => e.stopPropagation());
+
+  document.addEventListener("click", () => {
+    if (visible) setVisible(false);
+  });
 
   window.addEventListener("keydown", (e) => {
     if (e.key !== "i" && e.key !== "I") return;
@@ -13,8 +29,10 @@ export function setupPaneToggle(pane) {
     if (e.altKey || e.shiftKey) return;
 
     e.preventDefault();
-    setVisible(!visible);
+    toggle();
   });
 
-  return { setVisible, isVisible: () => visible };
+  setVisible(false);
+
+  return { setVisible, toggle, isVisible: () => visible };
 }

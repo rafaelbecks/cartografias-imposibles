@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { getEnvPath, params } from "./config.js";
 import { createSceneSystem } from "./scene.js";
 import { createModelLoader } from "./modelLoader.js";
 import { createInputSystem } from "./input.js";
@@ -11,8 +10,6 @@ import { createSensorClient } from "./sensor/sensorClient.js";
 import { createSensorController } from "./sensor/sensorController.js";
 import { sensorParams } from "./sensor/sensorConfig.js";
 import { createTextOverlay } from "./text/textOverlay.js";
-import { textParams } from "./text/textParams.js";
-
 const loading = createLoading();
 
 const sceneSystem = createSceneSystem({ loading });
@@ -98,14 +95,6 @@ function animate() {
     `target x: ${t.x.toFixed(2)} &nbsp; y: ${t.y.toFixed(2)} &nbsp; z: ${t.z.toFixed(2)}`;
 }
 
-const startup = [
-  modelLoader.loadModel(params.model),
-  ui.reloadEnvironment(),
-];
-if (textParams.enabled) {
-  startup.push(textOverlay.init());
-}
-
-Promise.all(startup).catch(console.error);
+Promise.all([ui.scenesUI.loadDefault()]).catch(console.error);
 
 animate();
