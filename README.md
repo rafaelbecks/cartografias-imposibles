@@ -1,51 +1,49 @@
-# Cartografías Imposibles 3d
+# Topografías de la intemperie
 
-3D Extension of **Cartografías Imposibles**: maps of non-existent territories that follow their own spatial logic. Starting from suminagashi, its fluid logic is translated into an algorithmic process of continuous deformation.
+Entorno virtual de memoria deformada.
 
-## Components
+### Script de Blender (`extrude_curves.py`)
 
-### Blender Script (`extrude_curves.py`)
+Extruye curvas SVG importadas en Blender con un perfil de altura dinámico (coseno).
 
-Extrudes imported SVG curves in Blender using a dynamic height profile (cosine).
-
-```python path=null start=null
-# Run in Blender:
+```python
+# Ejecutar en Blender:
 exec(open("/path/to/extrude_curves.py").read())
 ```
 
-**Settings:**
-- `MAX_HEIGHT` — maximum extrusion height
-- `TOP_CURVE` / `BOTTOM_CURVE` — range of curves to process
-- `COMPENSATE_CENTER` — vertically centers each curve
+**Parámetros:**
+- `MAX_HEIGHT` — altura máxima de extrusión
+- `TOP_CURVE` / `BOTTOM_CURVE` — rango de curvas a procesar
+- `COMPENSATE_CENTER` — centra verticalmente cada curva
 
-### Viewer (`index.html`)
+### Visor (`index.html`)
 
-Three.js viewer for exported GLB models.
+Visor Three.js para modelos GLB exportados.
 
-```bash path=null start=null
+```bash
 npm install
 npm run start
 ```
 
 #### Environment maps (EXR)
 
-Experimental deformed environments are built from photos in `env/exr/jpg/` (`.jpg`, `.jpeg`, `.heic`). Conversion uses [OpenImageIO](https://openimageio.readthedocs.io/) (`oiiotool`).
+Los entornos deformados experimentales se construyen a partir de fotos en `env/exr/jpg/` (`.jpg`, `.jpeg`, `.heic`). La conversión usa [OpenImageIO](https://openimageio.readthedocs.io/) (`oiiotool`).
 
-**Install OpenImageIO (macOS):**
+**Instalar OpenImageIO (macOS):**
 
-```bash path=null start=null
+```bash
 brew install openimageio
 ```
 
-**Convert sources to EXR** (writes `env/exr/<name>_env.exr` and regenerates the env list in `src/exrEnvironments.generated.js`):
+**Convertir fuentes a EXR** (genera `env/exr/<name>_env.exr` y regenera la lista en `src/exrEnvironments.generated.js`):
 
-```bash path=null start=null
+```bash
 npm run convert:env
 ```
 
-Each image is processed with:
+Cada imagen se procesa con:
 
-```bash path=null start=null
+```bash
 oiiotool <source> \
   --tocolorspace linear \
   --mulc 6,6,6 \
@@ -53,20 +51,24 @@ oiiotool <source> \
   -o env/exr/<name>_env.exr
 ```
 
-After conversion, restart the viewer and pick **env type → EXR** in Tweakpane to use the new maps.
+Tras la conversión, reinicia el visor y elige **env type → EXR** en Tweakpane para usar los nuevos mapas.
 
-#### Scene state
+#### Estado de escena
 
-In the viewer, use **State → Export JSON** / **Load JSON** (above the Scene/Animation tabs) to save and restore scene settings (model, lighting, environment, camera, terrain animation, grain overlay, etc.). Exports are named `memory-{timestamp}.json`.
+En el visor, usa **State → Export JSON** / **Load JSON** (sobre las pestañas Scene/Animation) para guardar y restaurar la configuración (modelo, iluminación, entorno, cámara, animación del terreno, grain overlay, etc.). Las exportaciones se nombran `memory-{timestamp}.json`. Escenas predefinidas en `scenes/` (disensión, inefable, cuerda, ventanas, ciénaga).
 
-**Shortcuts:** `Ctrl+I` (or `Cmd+I` on macOS) toggles the controls panel.
+**Atajos:** `Ctrl+I` (o `Cmd+I` en macOS) muestra u oculta el panel de controles.
 
-**Grain overlay** uses [grained.js](https://github.com/sarathsaleem/grained) (MIT) — enable it in the **Grain overlay** folder at the bottom of the controls panel.
+**Grain overlay** usa [grained.js](https://github.com/sarathsaleem/grained) (MIT) — actívalo en la carpeta **Grain overlay** al final del panel de controles.
 
-## Author
+#### Sensor (IMU)
+
+Controlador IMU por WebSocket para navegación física (mineral/arcilla). Configúralo en el panel Sensor; por defecto apunta a `ws://127.0.0.1:8080`.
+
+## Autor
 
 Rafael Becerra
 
-## License
+## Licencia
 
 MIT
