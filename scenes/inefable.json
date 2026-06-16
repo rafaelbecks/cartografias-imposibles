@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 7,
   "params": {
     "lightIntensity": 2.8,
     "ambient": 1.52,
@@ -49,18 +49,40 @@
     "grainChaos": 0.5,
     "grainSpeed": 20
   },
+  "dither": {
+    "enabled": false,
+    "saturate": 1,
+    "tableValuesR": 0,
+    "tableValuesG": 0,
+    "tableValuesB": 0
+  },
+  "stereo": {
+    "anaglyphEnabled": false,
+    "parallaxBarrierEnabled": false,
+    "eyeSep": 0.064,
+    "planeDistance": 200
+  },
   "text": {
     "enabled": true,
     "lineId": "inefable",
+    "content": "",
     "fontSize": 105,
     "letterSpacing": 0.17,
     "depth": 15,
     "scale": 0.35,
+    "upright": false,
+    "direction": "rtl",
+    "align": "justify",
+    "lineWidth": 3000,
+    "lineHeight": 1.25,
+    "animationMode": "twister",
     "orbitSpeed": 0.08,
     "wireframe": true,
     "twisterSpeed": 0.4,
     "twisterHeight": 300,
-    "twisterRadius": 300
+    "twisterRadius": 300,
+    "flipSpeed": 0.3,
+    "flipPauseDuration": 0.3
   },
   "audio": {
     "playing": true,
@@ -73,7 +95,7 @@
   },
   "ocean": {
     "enabled": true,
-    "shape": "torus",
+    "shape": "sphere",
     "height": -20,
     "sizeScale": 8.5,
     "shapeSegments": 256,
@@ -81,8 +103,14 @@
     "noiseAmplitude": 0.35,
     "noiseScale": 1.2,
     "noiseSeed": 42,
-    "envelopeRadius": 1.4,
+    "envelopeRadius": 2.7,
     "torusTube": 0.36999999999999994,
+    "torusKnotRadius": 1.05,
+    "torusKnotTube": 0.19,
+    "torusKnotTubularSegments": 463,
+    "torusKnotRadialSegments": 51,
+    "torusKnotP": 2,
+    "torusKnotQ": 4,
     "envelopeSide": "double",
     "waterColor": "#b8750c",
     "sunColor": "#ff0000",
@@ -91,6 +119,15 @@
     "distortionScale": 6,
     "waveSize": 9.6,
     "alpha": 1
+  },
+  "particles": {
+    "enabled": false,
+    "useModelColors": true,
+    "color": "#c8a0b0",
+    "luminance": 1,
+    "count": 150000,
+    "size": 6.15,
+    "opacity": 0.85
   },
   "scene": {
     "environmentIntensity": 1.36,
