@@ -2,7 +2,12 @@ import * as THREE from "three";
 import { Water } from "three/addons/objects/Water.js";
 import { oceanParams } from "./oceanParams.js";
 import {
+  applyEnvelopeNoiseDeform,
+  captureEnvelopeBaseGeometry,
+} from "./envelopeNoiseDeform.js";
+import {
   createOceanGeometry,
+  DEFORMABLE_ENVELOPE_SHAPES,
   ENVELOPE_SHAPES,
   FLAT_SHAPES,
   getEnvelopeBoundsRadius,
@@ -58,6 +63,7 @@ export function createOceanSystem({ scene, getModelBounds }) {
   let water = null;
   let waterNormals = null;
   let builtGeometryKey = null;
+  let torusNoiseMix = 0;
   const sun = new THREE.Vector3();
 
   function loadWaterNormals() {
@@ -119,7 +125,11 @@ export function createOceanSystem({ scene, getModelBounds }) {
       water.position.set(center.x, oceanParams.height, center.z);
       water.scale.set(1, 1, 1);
     } else {
-      water.rotation.set(0, 0, 0);
+      water.rotation.set(
+        oceanParams.envelopeRotationX,
+        oceanParams.envelopeRotationY,
+        oceanParams.envelopeRotationZ
+      );
       water.position.copy(center);
       water.scale.set(1, 1, 1);
     }
@@ -144,6 +154,11 @@ export function createOceanSystem({ scene, getModelBounds }) {
       water = createWaterMesh(geometry);
       water.renderOrder = -1;
       scene.add(water);
+    }
+
+    if (DEFORMABLE_ENVELOPE_SHAPES.has(oceanParams.shape)) {
+      captureEnvelopeBaseGeometry(water.geometry);
+      applyEnvelopeNoiseDeform(water.geometry, oceanParams, torusNoiseMix);
     }
 
     builtGeometryKey = key;
@@ -176,10 +191,38 @@ export function createOceanSystem({ scene, getModelBounds }) {
     updateTransform();
   }
 
+  function updateEnvelopeNoise(delta) {
+    if (!water || !DEFORMABLE_ENVELOPE_SHAPES.has(oceanParams.shape)) return;
+
+    if (!water.geometry.userData.oceanBasePosition) {
+      captureEnvelopeBaseGeometry(water.geometry);
+    }
+
+    const target = oceanParams.torusNoiseEnabled ? 1 : 0;
+    torusNoiseMix = THREE.MathUtils.damp(
+      torusNoiseMix,
+      target,
+      oceanParams.torusNoiseMorphSpeed,
+      delta
+    );
+
+    applyEnvelopeNoiseDeform(water.geometry, oceanParams, torusNoiseMix);
+  }
+
+  function snapTorusNoiseMix(value) {
+    torusNoiseMix = value;
+    if (!water || !DEFORMABLE_ENVELOPE_SHAPES.has(oceanParams.shape)) return;
+    if (!water.geometry.userData.oceanBasePosition) {
+      captureEnvelopeBaseGeometry(water.geometry);
+    }
+    applyEnvelopeNoiseDeform(water.geometry, oceanParams, torusNoiseMix);
+  }
+
   function update(delta) {
     if (!water || !oceanParams.enabled) return;
     water.material.uniforms.time.value += delta;
+    updateEnvelopeNoise(delta);
   }
 
-  return { sync, bindModel, update };
+  return { sync, bindModel, update, snapTorusNoiseMix };
 }

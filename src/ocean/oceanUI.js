@@ -78,7 +78,7 @@ export function setupOceanUI(page, oceanSystem) {
   envelopeFolder.addBinding(oceanParams, "envelopeRadius", {
     label: "radius scale",
     min: 0.5,
-    max: 8,
+    max: 30,
     step: 0.05,
   });
 
@@ -87,6 +87,48 @@ export function setupOceanUI(page, oceanSystem) {
     min: 0.05,
     max: 0.8,
     step: 0.01,
+  });
+
+  const torusNoiseFolder = envelopeFolder.addFolder({
+    title: "Torus noise deform",
+    expanded: false,
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseEnabled", { label: "enabled" });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseAmplitude", {
+    label: "amplitude",
+    min: 0,
+    max: 1,
+    step: 0.01,
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseScale", {
+    label: "frequency",
+    min: 0.1,
+    max: 6,
+    step: 0.05,
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseOctaves", {
+    label: "octaves",
+    min: 1,
+    max: 5,
+    step: 1,
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseSeed", {
+    label: "seed",
+    min: 0,
+    max: 9999,
+    step: 1,
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseMorphSpeed", {
+    label: "morph speed",
+    min: 0.5,
+    max: 12,
+    step: 0.1,
   });
 
   const torusKnotFolder = envelopeFolder.addFolder({
@@ -184,5 +226,6 @@ export function setupOceanUI(page, oceanSystem) {
   flatFolder.on("change", sync);
   noiseFolder.on("change", sync);
   envelopeFolder.on("change", sync);
+  torusNoiseFolder.on("change", sync);
   torusKnotFolder.on("change", sync);
 }

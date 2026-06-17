@@ -60,6 +60,10 @@ export const OBJECT_SOUNDS = {
     label: "Renacuajos",
     file: "renacuajos.wav",
   },
+  sanfernando: {
+    label: "San Fernando",
+    file: "san fernando.wav",
+  },
   tunnelbanna: {
     label: "Tunnelbanna",
     file: "tunnelbanna.wav",

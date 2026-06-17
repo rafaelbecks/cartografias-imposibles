@@ -17,6 +17,7 @@ import { setupSpeechUI } from "./speech/speechUI.js";
 import { ditherParams } from "./dither/ditherParams.js";
 import { randomDistinctDitherRgb } from "./dither/ditherTableValues.js";
 import { particleParams } from "./particles/particleParams.js";
+import { advanceOceanShapeCycle } from "./ocean/oceanShapeCycle.js";
 import { FRONT_SCENE, SCENE_ORDER } from "./scenes.js";
 
 export function createUI(ctx) {
@@ -143,7 +144,19 @@ export function createUI(ctx) {
     refresh();
   }
 
-  setupSpeechUI(pane, { toggleWireframe, toggleParticles, toggleDither });
+  function cycleOceanShape() {
+    if (!ctx.oceanSystem) return;
+    const changed = advanceOceanShapeCycle(ctx.oceanSystem);
+    refresh();
+    return changed;
+  }
+
+  setupSpeechUI(pane, {
+    toggleWireframe,
+    toggleParticles,
+    toggleDither,
+    cycleOceanShape,
+  });
 
   const sensorUI = setupSensorUI(pane, {
     sensorClient: ctx.sensorClient,

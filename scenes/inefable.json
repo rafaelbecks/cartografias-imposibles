@@ -88,8 +88,8 @@
     "playing": true,
     "envSound": "aves",
     "envVolume": 0.5,
-    "objectSound": "piano_resonancia",
-    "objectVolume": 0,
+    "objectSound": "sanfernando",
+    "objectVolume": 0.36,
     "sensitivity": 1,
     "loopFadeMs": 800
   },

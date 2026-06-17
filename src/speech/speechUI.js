@@ -9,7 +9,10 @@ const LANG_OPTIONS = {
   "English (US)": "en-US",
 };
 
-export function setupSpeechUI(pane, { toggleWireframe, toggleParticles, toggleDither } = {}) {
+export function setupSpeechUI(
+  pane,
+  { toggleWireframe, toggleParticles, toggleDither, cycleOceanShape } = {}
+) {
   const folder = pane.addFolder({ title: "Voice (PoC)", expanded: true });
 
   const state = {
@@ -25,6 +28,7 @@ export function setupSpeechUI(pane, { toggleWireframe, toggleParticles, toggleDi
     toggleWireframe,
     toggleParticles,
     toggleDither,
+    cycleOceanShape,
   });
 
   const recognition = createSpeechRecognition({
@@ -33,6 +37,8 @@ export function setupSpeechUI(pane, { toggleWireframe, toggleParticles, toggleDi
       if (final) {
         commands.handleFinalText(final);
         if (speechParams.showSubtitles) subtitles.appendFinal(final);
+      } else if (interim) {
+        commands.handleInterimText(interim);
       }
       if (speechParams.showSubtitles) subtitles.setInterim(interim);
     },

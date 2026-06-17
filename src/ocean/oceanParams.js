@@ -25,6 +25,15 @@ export const oceanParams = {
   torusKnotRadialSegments: 16,
   torusKnotP: 2,
   torusKnotQ: 3,
+  torusNoiseEnabled: false,
+  torusNoiseAmplitude: 0.25,
+  torusNoiseScale: 1.5,
+  torusNoiseSeed: 42,
+  torusNoiseOctaves: 3,
+  torusNoiseMorphSpeed: 3,
+  envelopeRotationX: 0,
+  envelopeRotationY: 0,
+  envelopeRotationZ: 0,
   envelopeSide: ENVELOPE_SIDE_OPTIONS.double,
   waterColor: "#001e0f",
   sunColor: "#ffffff",
@@ -53,6 +62,15 @@ export const OCEAN_PARAM_KEYS = [
   "torusKnotRadialSegments",
   "torusKnotP",
   "torusKnotQ",
+  "torusNoiseEnabled",
+  "torusNoiseAmplitude",
+  "torusNoiseScale",
+  "torusNoiseSeed",
+  "torusNoiseOctaves",
+  "torusNoiseMorphSpeed",
+  "envelopeRotationX",
+  "envelopeRotationY",
+  "envelopeRotationZ",
   "envelopeSide",
   "waterColor",
   "sunColor",
@@ -70,4 +88,8 @@ export function clampOceanParams() {
   if (!ENVELOPE_SIDE_OPTIONS[oceanParams.envelopeSide]) {
     oceanParams.envelopeSide = "outside";
   }
+  oceanParams.torusNoiseOctaves = Math.max(
+    1,
+    Math.min(5, Math.round(oceanParams.torusNoiseOctaves))
+  );
 }

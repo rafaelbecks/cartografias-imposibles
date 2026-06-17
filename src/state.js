@@ -20,6 +20,7 @@ import {
   animationParams,
 } from "./terrain/animationParams.js";
 import { clampOceanParams, OCEAN_PARAM_KEYS, oceanParams } from "./ocean/oceanParams.js";
+import { resetOceanShapeCycle } from "./ocean/oceanShapeCycle.js";
 import {
   clampParticleParams,
   PARTICLE_PARAM_KEYS,
@@ -168,6 +169,7 @@ function applyAudioState(audio) {
 }
 
 function applyOceanState(ocean) {
+  resetOceanShapeCycle();
   if (!ocean) return;
   for (const key of OCEAN_PARAM_KEYS) {
     if (ocean[key] !== undefined) oceanParams[key] = ocean[key];
