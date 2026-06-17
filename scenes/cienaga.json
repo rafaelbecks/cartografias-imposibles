@@ -66,8 +66,8 @@
     "playing": true,
     "envSound": "delirio",
     "envVolume": 0.5,
-    "objectSound": "eterofono",
-    "objectVolume": 0,
+    "objectSound": "pata_perro",
+    "objectVolume": 0.3,
     "sensitivity": 1,
     "loopFadeMs": 800
   },
