@@ -5,7 +5,7 @@ import { stereoParams } from "./stereoParams.js";
 /**
  * Routes scene rendering through Three.js stereo effects when enabled.
  */
-export function createStereoEffects(renderer) {
+export function createStereoEffects(renderer, { postProcessing } = {}) {
   const width = window.innerWidth || 2;
   const height = window.innerHeight || 2;
 
@@ -37,6 +37,11 @@ export function createStereoEffects(renderer) {
     const active = getActiveEffect();
     if (active) {
       active.setSize(nextWidth, nextHeight);
+      postProcessing?.setSize(nextWidth, nextHeight);
+      return;
+    }
+    if (postProcessing) {
+      postProcessing.setSize(nextWidth, nextHeight);
       return;
     }
     renderer.setSize(nextWidth, nextHeight);
@@ -49,6 +54,8 @@ export function createStereoEffects(renderer) {
     const active = getActiveEffect();
     if (active) {
       active.render(scene, camera);
+    } else if (postProcessing?.isActive()) {
+      postProcessing.render();
     } else {
       renderer.render(scene, camera);
     }

@@ -9,6 +9,11 @@ import {
 } from "./audio/audioSources.js";
 import { GRAIN_PARAM_KEYS, grainParams } from "./grain/grainParams.js";
 import { DITHER_PARAM_KEYS, clampDitherParams, ditherParams } from "./dither/ditherParams.js";
+import {
+  ORDERED_DITHER_PARAM_KEYS,
+  clampOrderedDitherParams,
+  orderedDitherParams,
+} from "./postprocessing/orderedDitherParams.js";
 import { STEREO_PARAM_KEYS, stereoParams } from "./stereo/stereoParams.js";
 import { DEFAULT_PAGE_TITLE, syncPageTitle, TEXT_LINES } from "./text/textLines.js";
 import { DEFAULT_TEXT_PARAMS, TEXT_PARAM_KEYS, textParams, ANIMATION_MODES } from "./text/textParams.js";
@@ -27,8 +32,8 @@ import {
   particleParams,
 } from "./particles/particleParams.js";
 
-export const STATE_VERSION = 7;
-const SUPPORTED_VERSIONS = [1, 2, 3, 4, 5, 6, 7];
+export const STATE_VERSION = 8;
+const SUPPORTED_VERSIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const PARAM_KEYS = [
   "lightIntensity",
@@ -65,6 +70,10 @@ function pickGrainParams(source = {}) {
 
 function pickDitherParams(source = {}) {
   return pickParams(source, DITHER_PARAM_KEYS);
+}
+
+function pickOrderedDitherParams(source = {}) {
+  return pickParams(source, ORDERED_DITHER_PARAM_KEYS);
 }
 
 function pickStereoParams(source = {}) {
@@ -142,6 +151,14 @@ function applyDitherState(dither) {
   clampDitherParams();
 }
 
+function applyOrderedDitherState(orderedDither) {
+  if (!orderedDither) return;
+  for (const key of ORDERED_DITHER_PARAM_KEYS) {
+    if (orderedDither[key] !== undefined) orderedDitherParams[key] = orderedDither[key];
+  }
+  clampOrderedDitherParams();
+}
+
 function applyStereoState(stereo) {
   if (!stereo) return;
   for (const key of STEREO_PARAM_KEYS) {
@@ -215,6 +232,7 @@ export function captureState({ scene, camera, controls }) {
     animation: pickAnimationParams(animationParams),
     grain: pickGrainParams(grainParams),
     dither: pickDitherParams(ditherParams),
+    orderedDither: pickOrderedDitherParams(orderedDitherParams),
     stereo: pickStereoParams(stereoParams),
     text: pickTextParams(textParams),
     audio: pickAudioParams(audioParams),
@@ -295,6 +313,11 @@ async function applyStateInner(state, ctx, { silent = false } = {}) {
   if (state.dither) {
     applyDitherState(state.dither);
   }
+  if (state.version >= 8 && state.orderedDither) {
+    applyOrderedDitherState(state.orderedDither);
+  } else {
+    orderedDitherParams.enabled = false;
+  }
   if (state.stereo) {
     applyStereoState(state.stereo);
   }
@@ -324,6 +347,7 @@ async function applyStateInner(state, ctx, { silent = false } = {}) {
   ctx.grainOverlay?.sync();
   ctx.ditherOverlay?.sync();
   ctx.stereoEffects?.sync();
+  ctx.postProcessing?.sync();
   ctx.audioSystem?.stop({ preserveIntent: true });
 
   const loadOpts = { silent, skipIntro: !!storedInitialCamera };

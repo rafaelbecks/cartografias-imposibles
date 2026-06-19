@@ -1,7 +1,7 @@
 const COMMAND_GROUPS = [
   {
     id: "wireframe",
-    words: ["cuerda", "tejido"],
+    words: ["cuerda", "tejido", "nervio"],
   },
   {
     id: "particles",
@@ -13,7 +13,7 @@ const COMMAND_GROUPS = [
   },
   {
     id: "oceanCycle",
-    words: ["cienaga", "manglar"],
+    words: ["cienaga", "manglar", "humedal"],
   },
 ];
 

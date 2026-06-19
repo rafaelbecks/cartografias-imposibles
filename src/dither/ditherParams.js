@@ -6,7 +6,7 @@ export const ditherParams = {
   tableValuesG: 0,
   tableValuesB: 0,
   cycleEnabled: false,
-  cycleIntervalSec: 1,
+  cycleIntervalSec: 2,
   cycleSmooth: true,
 };
 

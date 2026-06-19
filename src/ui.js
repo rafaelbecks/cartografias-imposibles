@@ -4,6 +4,7 @@ import { captureState, downloadState, loadStateFromFile } from "./state.js";
 import { setupAnimationUI } from "./terrain/animationUI.js";
 import { setupGrainUI } from "./grain/grainUI.js";
 import { setupDitherUI } from "./dither/ditherUI.js";
+import { setupOrderedDitherUI } from "./postprocessing/orderedDitherUI.js";
 import { setupStereoUI } from "./stereo/stereoUI.js";
 import { setupSceneTabUI } from "./ui/sceneTabUI.js";
 import { setupPaneToggle } from "./ui/paneToggle.js";
@@ -15,6 +16,10 @@ import { setupTextUI } from "./text/textUI.js";
 import { setupAudioUI } from "./audio/audioUI.js";
 import { setupSpeechUI } from "./speech/speechUI.js";
 import { ditherParams } from "./dither/ditherParams.js";
+import {
+  activateOrderedDitherVoice,
+  deactivateOrderedDitherVoice,
+} from "./postprocessing/orderedDitherParams.js";
 import { particleParams } from "./particles/particleParams.js";
 import { advanceOceanShapeCycle } from "./ocean/oceanShapeCycle.js";
 import { FRONT_SCENE, SCENE_ORDER } from "./scenes.js";
@@ -101,6 +106,8 @@ export function createUI(ctx) {
     ctx.oceanSystem?.sync();
     ctx.particleSystem?.sync();
     ctx.stereoEffects?.sync();
+    ctx.postProcessing?.sync();
+    ctx.orderedDitherUI?.refresh();
   }
 
   setupAnimationUI(animationPage, terrainAnimation, pane);
@@ -109,8 +116,14 @@ export function createUI(ctx) {
     setupDitherUI(pane, ctx.ditherOverlay, ctx.ditherCycle);
   }
 
+  let orderedDitherUI;
+  if (ctx.postProcessing) {
+    orderedDitherUI = setupOrderedDitherUI(pane, ctx.postProcessing, ctx.stereoEffects);
+    ctx.orderedDitherUI = orderedDitherUI;
+  }
+
   if (ctx.stereoEffects) {
-    setupStereoUI(pane, ctx.stereoEffects);
+    setupStereoUI(pane, ctx.stereoEffects, () => orderedDitherUI?.refresh());
   }
 
   if (ctx.textOverlay) {
@@ -136,10 +149,13 @@ export function createUI(ctx) {
   function toggleDither() {
     if (ditherParams.enabled && ditherParams.cycleEnabled) {
       ctx.ditherCycle?.deactivate();
+      deactivateOrderedDitherVoice();
     } else {
       ctx.ditherCycle?.activate();
+      activateOrderedDitherVoice();
     }
     ctx.ditherOverlay?.sync();
+    ctx.postProcessing?.sync();
     refresh();
   }
 

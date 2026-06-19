@@ -17,7 +17,7 @@ function addStereoSettings(folder, stereoEffects) {
   folder.on("change", () => stereoEffects.applyParams());
 }
 
-export function setupStereoUI(pane, stereoEffects) {
+export function setupStereoUI(pane, stereoEffects, onChange) {
   const anaglyphFolder = pane.addFolder({ title: "Anaglyph", expanded: false });
   const anaglyphSettings = anaglyphFolder.addFolder({ title: "Anaglyph settings", expanded: true });
 
@@ -38,6 +38,7 @@ export function setupStereoUI(pane, stereoEffects) {
     anaglyphSettings.hidden = !stereoParams.anaglyphEnabled;
     parallaxSettings.hidden = !stereoParams.parallaxBarrierEnabled;
     stereoEffects.sync();
+    onChange?.();
   }
 
   anaglyphFolder.on("change", () => {

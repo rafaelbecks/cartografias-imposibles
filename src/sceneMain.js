@@ -17,6 +17,7 @@ import { createAudioSystem } from "./audio/audioSystem.js";
 import { createOceanSystem } from "./ocean/oceanSystem.js";
 import { createParticleSystem } from "./particles/particleSystem.js";
 import { createStereoEffects } from "./stereo/stereoEffects.js";
+import { createPostProcessing } from "./postprocessing/createPostProcessing.js";
 
 export async function bootSceneViewer(sceneName) {
   document.body.classList.remove("front-page");
@@ -41,7 +42,8 @@ export async function bootSceneViewer(sceneName) {
     setViewportSize,
   } = sceneSystem;
 
-  const stereoEffects = createStereoEffects(renderer);
+  const postProcessing = createPostProcessing(renderer, scene, camera);
+  const stereoEffects = createStereoEffects(renderer, { postProcessing });
   setViewportSize(stereoEffects.setSize);
 
   let hasRendered = false;
@@ -120,6 +122,7 @@ export async function bootSceneViewer(sceneName) {
     oceanSystem,
     particleSystem,
     stereoEffects,
+    postProcessing,
     sceneFreeze,
   });
 
