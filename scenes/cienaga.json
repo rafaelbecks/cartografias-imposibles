@@ -89,7 +89,7 @@
     "sunElevation": 39.099999999999994,
     "sunAzimuth": 137,
     "distortionScale": 8,
-    "waveSize": 3.0000000000000004,
+    "waveSize": 10,
     "alpha": 1,
     "torusNoiseScaleModEnabled": true,
     "torusNoiseScaleModRate": 0.11,
