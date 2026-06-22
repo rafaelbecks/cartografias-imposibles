@@ -96,7 +96,7 @@
   "ocean": {
     "enabled": true,
     "shape": "sphere",
-    "height": -20,
+    "height": -1,
     "sizeScale": 8.5,
     "shapeSegments": 256,
     "ovalRatio": 1.5,

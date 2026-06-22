@@ -19,7 +19,17 @@ const DEFAULT_DEVICE_OPTION = { Default: "" };
 
 export function setupSpeechUI(
   page,
-  { refresh, toggleWireframe, toggleParticles, toggleDither, cycleOceanShape, loadLionzaModel } = {}
+  {
+    refresh,
+    toggleWireframe,
+    toggleParticles,
+    enableDelirioDither,
+    toggleDither,
+    setOceanManglar,
+    setOceanCienaga,
+    setOceanHumedal,
+    loadLionzaModel,
+  } = {}
 ) {
   const folder = page.addFolder({ title: "Voice (PoC)", expanded: true });
   const inputSupported = isAudioInputSupported();
@@ -41,8 +51,11 @@ export function setupSpeechUI(
     {
       toggleWireframe,
       toggleParticles,
+      enableDelirioDither,
       toggleDither,
-      cycleOceanShape,
+      setOceanManglar,
+      setOceanCienaga,
+      setOceanHumedal,
       loadLionzaModel,
     },
     { getCooldownMs: () => speechParams.commandCooldownMs }
@@ -186,6 +199,13 @@ export function setupSpeechUI(
     min: 800,
     max: 8000,
     step: 100,
+  });
+
+  folder.addBinding(speechParams, "delirioDitherDurationMs", {
+    label: "delirio dither (ms)",
+    min: 1000,
+    max: 30000,
+    step: 500,
   });
 
   folder.addButton({ title: "Start listening" }).on("click", () => {

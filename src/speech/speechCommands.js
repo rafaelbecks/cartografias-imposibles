@@ -25,12 +25,24 @@ const COMMAND_GROUPS = [
     words: ["fragmento", "sedimento"],
   },
   {
-    id: "dither",
-    words: ["delirio", "vertico", "vertigo", "extasis", "ecstasis"],
+    id: "ditherDelirio",
+    words: ["delirio"],
   },
   {
-    id: "oceanCycle",
-    words: ["cienaga", "manglar", "humedal"],
+    id: "dither",
+    words: ["vertico", "vertigo", "extasis", "ecstasis"],
+  },
+  {
+    id: "oceanManglar",
+    words: ["manglar"],
+  },
+  {
+    id: "oceanCienaga",
+    words: ["cienaga"],
+  },
+  {
+    id: "oceanHumedal",
+    words: ["humedal"],
   },
 ];
 
@@ -66,14 +78,26 @@ export function matchSpeechCommands(text) {
 }
 
 export function createSpeechCommandHandler(
-  { toggleWireframe, toggleParticles, toggleDither, cycleOceanShape, loadLionzaModel },
+  {
+    toggleWireframe,
+    toggleParticles,
+    enableDelirioDither,
+    toggleDither,
+    setOceanManglar,
+    setOceanCienaga,
+    setOceanHumedal,
+    loadLionzaModel,
+  },
   { getCooldownMs = () => DEFAULT_COMMAND_COOLDOWN_MS } = {}
 ) {
   const handlers = {
     wireframe: toggleWireframe,
     particles: toggleParticles,
+    ditherDelirio: enableDelirioDither,
     dither: toggleDither,
-    oceanCycle: cycleOceanShape,
+    oceanManglar: setOceanManglar,
+    oceanCienaga: setOceanCienaga,
+    oceanHumedal: setOceanHumedal,
     lionza: loadLionzaModel,
   };
 

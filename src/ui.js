@@ -21,7 +21,12 @@ import {
   deactivateOrderedDitherVoice,
 } from "./postprocessing/orderedDitherParams.js";
 import { particleParams } from "./particles/particleParams.js";
-import { advanceOceanShapeCycle } from "./ocean/oceanShapeCycle.js";
+import {
+  applyOceanFlatNoise,
+  applyOceanSphere,
+  applyOceanTorusNoise,
+} from "./ocean/oceanShapeCycle.js";
+import { speechParams } from "./speech/speechParams.js";
 import { FRONT_SCENE, SCENE_ORDER } from "./scenes.js";
 
 export function createUI(ctx) {
@@ -159,11 +164,46 @@ export function createUI(ctx) {
     refresh();
   }
 
-  function cycleOceanShape() {
+  let delirioDitherTimer = null;
+
+  function enableDelirioDither() {
+    if (delirioDitherTimer) clearTimeout(delirioDitherTimer);
+
+    if (!ditherParams.enabled || !ditherParams.cycleEnabled) {
+      ctx.ditherCycle?.activate();
+      activateOrderedDitherVoice();
+      ctx.ditherOverlay?.sync();
+      ctx.postProcessing?.sync();
+      refresh();
+    }
+
+    delirioDitherTimer = setTimeout(() => {
+      delirioDitherTimer = null;
+      if (!ditherParams.enabled) return;
+      ctx.ditherCycle?.deactivate();
+      deactivateOrderedDitherVoice();
+      ctx.ditherOverlay?.sync();
+      ctx.postProcessing?.sync();
+      refresh();
+    }, speechParams.delirioDitherDurationMs);
+  }
+
+  function setOceanManglar() {
     if (!ctx.oceanSystem) return;
-    const changed = advanceOceanShapeCycle(ctx.oceanSystem);
+    applyOceanTorusNoise(ctx.oceanSystem);
     refresh();
-    return changed;
+  }
+
+  function setOceanCienaga() {
+    if (!ctx.oceanSystem) return;
+    applyOceanSphere(ctx.oceanSystem);
+    refresh();
+  }
+
+  function setOceanHumedal() {
+    if (!ctx.oceanSystem) return;
+    applyOceanFlatNoise(ctx.oceanSystem);
+    refresh();
   }
 
   function loadLionzaModel() {
@@ -176,8 +216,11 @@ export function createUI(ctx) {
     refresh: () => refresh(),
     toggleWireframe,
     toggleParticles,
+    enableDelirioDither,
     toggleDither,
-    cycleOceanShape,
+    setOceanManglar,
+    setOceanCienaga,
+    setOceanHumedal,
     loadLionzaModel,
   });
 

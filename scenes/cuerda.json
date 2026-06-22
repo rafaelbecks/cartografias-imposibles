@@ -81,7 +81,7 @@
     "noiseAmplitude": 0.7100000000000001,
     "noiseScale": 0.65,
     "noiseSeed": 42,
-    "envelopeRadius": 2.5,
+    "envelopeRadius": 30,
     "torusTube": 0.35,
     "envelopeSide": "double",
     "waterColor": "#235c42",
