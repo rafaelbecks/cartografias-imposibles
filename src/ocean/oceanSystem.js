@@ -159,7 +159,12 @@ export function createOceanSystem({ scene, getModelBounds }) {
 
     if (DEFORMABLE_ENVELOPE_SHAPES.has(oceanParams.shape)) {
       captureEnvelopeBaseGeometry(water.geometry);
-      applyEnvelopeNoiseDeform(water.geometry, oceanParams, torusNoiseMix);
+      applyEnvelopeNoiseDeform(
+        water.geometry,
+        oceanParams,
+        torusNoiseMix,
+        water.material.uniforms.time.value
+      );
     }
 
     builtGeometryKey = key;
@@ -207,7 +212,12 @@ export function createOceanSystem({ scene, getModelBounds }) {
       delta
     );
 
-    applyEnvelopeNoiseDeform(water.geometry, oceanParams, torusNoiseMix);
+    applyEnvelopeNoiseDeform(
+      water.geometry,
+      oceanParams,
+      torusNoiseMix,
+      water.material.uniforms.time.value
+    );
   }
 
   function snapTorusNoiseMix(value) {
@@ -216,7 +226,12 @@ export function createOceanSystem({ scene, getModelBounds }) {
     if (!water.geometry.userData.oceanBasePosition) {
       captureEnvelopeBaseGeometry(water.geometry);
     }
-    applyEnvelopeNoiseDeform(water.geometry, oceanParams, torusNoiseMix);
+    applyEnvelopeNoiseDeform(
+      water.geometry,
+      oceanParams,
+      torusNoiseMix,
+      water.material.uniforms.time.value
+    );
   }
 
   function update(delta) {

@@ -110,6 +110,24 @@ export function setupOceanUI(page, oceanSystem) {
     step: 0.05,
   });
 
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseScaleModEnabled", {
+    label: "frequency mod",
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseScaleModRate", {
+    label: "mod rate",
+    min: 0.05,
+    max: 2,
+    step: 0.01,
+  });
+
+  torusNoiseFolder.addBinding(oceanParams, "torusNoiseScaleModAmount", {
+    label: "mod amount",
+    min: 0,
+    max: 3,
+    step: 0.05,
+  });
+
   torusNoiseFolder.addBinding(oceanParams, "torusNoiseOctaves", {
     label: "octaves",
     min: 1,

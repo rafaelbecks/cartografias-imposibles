@@ -90,7 +90,10 @@
     "sunAzimuth": -15.70000000000001,
     "distortionScale": 8,
     "waveSize": 4.3999999999999995,
-    "alpha": 1
+    "alpha": 1,
+    "torusNoiseScaleModEnabled": true,
+    "torusNoiseScaleModRate": 0.1,
+    "torusNoiseScaleModAmount": 0.2
   },
   "scene": {
     "environmentIntensity": 1.36,

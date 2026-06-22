@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { triangleLfo } from "../front/lfo.js";
 import { createPerlin3D, sampleFbm3 } from "../math/perlin.js";
 
 const _point = new THREE.Vector3();
@@ -18,11 +19,22 @@ export function captureEnvelopeBaseGeometry(geometry) {
   geometry.userData.oceanBaseNormal = new Float32Array(geometry.attributes.normal.array);
 }
 
+function getTorusNoiseScale(params, timeSeconds) {
+  const base = params.torusNoiseScale;
+  if (!params.torusNoiseScaleModEnabled) return base;
+
+  const amount = params.torusNoiseScaleModAmount;
+  const min = Math.max(0.1, base - amount);
+  const max = base + amount;
+  return triangleLfo(timeSeconds, params.torusNoiseScaleModRate, min, max);
+}
+
 /**
  * Morph envelope vertices from base shape toward a noise-displaced surface.
  * @param {number} mix — 0 = regular, 1 = full deformation
+ * @param {number} timeSeconds — elapsed time for frequency LFO
  */
-export function applyEnvelopeNoiseDeform(geometry, params, mix) {
+export function applyEnvelopeNoiseDeform(geometry, params, mix, timeSeconds = 0) {
   const basePos = geometry.userData.oceanBasePosition;
   const baseNorm = geometry.userData.oceanBaseNormal;
   if (!basePos || !baseNorm) return;
@@ -42,7 +54,7 @@ export function applyEnvelopeNoiseDeform(geometry, params, mix) {
   const displacementScale = geometry.boundingSphere.radius * params.torusNoiseAmplitude;
 
   const noise3d = getNoise3d(params.torusNoiseSeed);
-  const freq = params.torusNoiseScale * 0.08;
+  const freq = getTorusNoiseScale(params, timeSeconds) * 0.08;
   const octaves = Math.max(1, Math.floor(params.torusNoiseOctaves));
 
   for (let i = 0; i < position.count; i++) {

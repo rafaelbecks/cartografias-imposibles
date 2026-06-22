@@ -28,6 +28,9 @@ export const oceanParams = {
   torusNoiseEnabled: false,
   torusNoiseAmplitude: 0.25,
   torusNoiseScale: 1.5,
+  torusNoiseScaleModEnabled: false,
+  torusNoiseScaleModRate: 0.25,
+  torusNoiseScaleModAmount: 0.5,
   torusNoiseSeed: 42,
   torusNoiseOctaves: 3,
   torusNoiseMorphSpeed: 3,
@@ -65,6 +68,9 @@ export const OCEAN_PARAM_KEYS = [
   "torusNoiseEnabled",
   "torusNoiseAmplitude",
   "torusNoiseScale",
+  "torusNoiseScaleModEnabled",
+  "torusNoiseScaleModRate",
+  "torusNoiseScaleModAmount",
   "torusNoiseSeed",
   "torusNoiseOctaves",
   "torusNoiseMorphSpeed",
@@ -92,4 +98,6 @@ export function clampOceanParams() {
     1,
     Math.min(5, Math.round(oceanParams.torusNoiseOctaves))
   );
+  oceanParams.torusNoiseScaleModAmount = Math.max(0, oceanParams.torusNoiseScaleModAmount);
+  oceanParams.torusNoiseScaleModRate = Math.max(0.01, oceanParams.torusNoiseScaleModRate);
 }
